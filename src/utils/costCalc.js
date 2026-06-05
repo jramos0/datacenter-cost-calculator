@@ -44,6 +44,7 @@ export function calcMonthlyCost(config, ratePerKwh, avgTempC) {
   const totalMonthly = energySubtotal + overheadCost
 
   return {
+    pueBase,
     itPowerKW,
     itEnergyKWh,
     coolingEnergyKWh,
