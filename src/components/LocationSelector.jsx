@@ -32,14 +32,50 @@ export default function LocationSelector({ selectedId, onSelect, rates, ratesLoa
     )
   }, [sorted, query])
 
+  const selectedLoc = ALL_LOCS.find(l => l.id === selectedId)
+  const selectedRate = selectedLoc?.isSV ? selectedLoc.hardcodedRate : (rates[selectedId] ?? null)
+  const selectedTemp = selectedLoc?.isSV ? selectedLoc.hardcodedTemp : (temps[selectedId] ?? null)
+
   return (
     <div className="rounded-lg p-4" style={{ background: '#0f1923', border: '1px solid #1e2d3d' }}>
+      {/* Selected location card */}
+      {selectedLoc && (
+        <div className="rounded-lg mb-4 px-4 py-3 flex items-center justify-between"
+          style={{ background: 'rgba(20,184,166,0.07)', border: '1px solid rgba(20,184,166,0.2)' }}>
+          <div>
+            <div className="text-xs font-mono uppercase mb-1" style={{ color: '#14b8a6', letterSpacing: '0.08em' }}>
+              Selected Location
+            </div>
+            <div className="font-semibold text-sm" style={{ color: '#e2e8f0' }}>
+              {selectedLoc.isSV ? '🇸🇻 ' : ''}{selectedLoc.name}
+            </div>
+          </div>
+          <div className="flex gap-6 text-right">
+            <div>
+              <div className="text-xs font-mono" style={{ color: '#4a6080' }}>Rate</div>
+              <div className="font-mono font-bold" style={{ color: '#14b8a6', fontSize: '18px' }}>
+                {selectedRate != null ? `$${selectedRate.toFixed(4)}/kWh` : (ratesLoading ? '···' : '—')}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs font-mono" style={{ color: '#4a6080' }}>Temp</div>
+              <div className="font-mono font-bold" style={{
+                color: selectedTemp != null && selectedTemp > 25 ? '#f59e0b' : '#94a3b8',
+                fontSize: '18px'
+              }}>
+                {selectedTemp != null ? `${selectedTemp}°C` : (tempsLoading && !selectedLoc.isSV ? '···' : '—')}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-mono uppercase tracking-widest" style={{ color: '#14b8a6' }}>
-          &gt; SELECT LOCATION
+        <span className="text-xs font-mono uppercase tracking-widest" style={{ color: '#4a6080' }}>
+          Change location
         </span>
-        <span className="text-xs font-mono" style={{ color: '#4a6080' }}>
+        <span className="text-xs font-mono" style={{ color: '#2d4a6b' }}>
           {filtered.length}/{ALL_LOCS.length}
         </span>
       </div>
@@ -74,15 +110,14 @@ export default function LocationSelector({ selectedId, onSelect, rates, ratesLoa
 
       {/* Column headers */}
       <div className="grid text-xs uppercase tracking-wider mb-1 px-2"
-        style={{ gridTemplateColumns: '48px 1fr 72px 88px', color: '#2d4a6b' }}>
-        <span>Code</span>
+        style={{ gridTemplateColumns: '1fr 72px 88px', color: '#2d4a6b' }}>
         <span>Location</span>
         <span className="text-center">Temp</span>
-        <span className="text-right">Rate ¢/kWh</span>
+        <span className="text-right">$/kWh</span>
       </div>
 
-      {/* Scrollable list */}
-      <div className="overflow-y-auto rounded" style={{ maxHeight: '384px', border: '1px solid #1e2d3d' }}>
+      {/* Scrollable list — 7 rows visible */}
+      <div className="overflow-y-auto rounded" style={{ maxHeight: '210px', border: '1px solid #1e2d3d' }}>
         {filtered.length === 0 ? (
           <div className="py-8 text-center text-xs font-mono" style={{ color: '#4a6080' }}>
             No locations match "{query}"
@@ -93,7 +128,7 @@ export default function LocationSelector({ selectedId, onSelect, rates, ratesLoa
             const isSelected = loc.id === selectedId
             const rate = isSV ? loc.hardcodedRate : (rates[loc.id] ?? null)
             const temp = isSV ? loc.hardcodedTemp : (temps[loc.id] ?? null)
-            const rateCents = rate != null ? (rate * 100).toFixed(1) + '¢' : (ratesLoading ? '···' : '—')
+            const rateCents = rate != null ? '$' + rate.toFixed(4) : (ratesLoading ? '···' : '—')
             const tempStr = temp != null ? `${temp}°C` : (tempsLoading && !isSV ? '···' : '—')
 
             return (
@@ -102,7 +137,7 @@ export default function LocationSelector({ selectedId, onSelect, rates, ratesLoa
                 onClick={() => onSelect(loc.id)}
                 className="w-full grid text-xs transition-colors duration-100"
                 style={{
-                  gridTemplateColumns: '48px 1fr 72px 88px',
+                  gridTemplateColumns: '1fr 72px 88px',
                   padding: '7px 8px',
                   borderLeft: isSelected ? '3px solid #14b8a6' : '3px solid transparent',
                   borderBottom: '1px solid #1e2d3d',
@@ -113,14 +148,9 @@ export default function LocationSelector({ selectedId, onSelect, rates, ratesLoa
                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
                 onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent' }}
               >
-                {/* Code */}
-                <span className="font-mono" style={{ color: isSV ? '#14b8a6' : '#4a6080' }}>
-                  {isSV ? '🇸🇻' : loc.id}
-                </span>
-
                 {/* Name */}
                 <span className="font-semibold truncate" style={{ color: isSelected ? '#e2e8f0' : '#94a3b8' }}>
-                  {loc.name}
+                  {isSV ? '🇸🇻 ' : ''}{loc.name}
                 </span>
 
                 {/* Temp */}

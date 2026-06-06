@@ -46,7 +46,7 @@ export default function App() {
     <div style={{ minHeight: '100vh', background: '#080d14' }}>
       <Header source={ratesLoading ? 'loading' : rateSource} />
 
-      <main className="max-w-screen-xl mx-auto p-4 flex flex-col gap-4">
+      <main className="max-w-screen-xl mx-auto p-4 flex flex-col gap-6">
         <LocationSelector
           selectedId={selectedId}
           onSelect={setSelectedId}
@@ -56,7 +56,7 @@ export default function App() {
           tempsLoading={tempsLoading}
         />
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
           <RackConfig config={config} onChange={setConfig} />
           <SummaryCards
             result={result}

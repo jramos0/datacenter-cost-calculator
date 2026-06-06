@@ -1,7 +1,0 @@
-interface:
-  display_name: "Cost Modeling"
-  short_description: "Validate data center cost formulas"
-  default_prompt: "Use $cost-modeling to review and update the calculator's cost formulas."
-
-policy:
-  allow_implicit_invocation: true
